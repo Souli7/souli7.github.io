@@ -1,5 +1,3 @@
-# souli7.github.io
-
 # Algorithmus für den Split der Aufträge
 
 ## Definition
@@ -87,3 +85,193 @@ y2 = 0,444 * (1 - 0,2) = 0,328
 5. Falls Auftrag noch nicht komplett erfüllbar Suche ohne den verwendeten Supplier wiederholen aber mit der gleichen Prio-Gruppe
 6. Falls Auftrag noch nicht komplett erfüllbar Suche mit nächster Prio-Gruppe fortführen
 7. Falls Auftrag immer noch nicht komplett erfüllbar suche Abbrechen => alle möglichen Splits wurden erstellt und die Restmenge bleibt beim Dealer zur weiteren Verarbeitung.
+
+# Use-Cases
+
+## allgemeine Ausgangssituation
+
+Dealer:
+
+* eleven teamsports GmbH
+  * Eigener Bestand wird bevorzugt
+  * Kann jegliche Veredelung vornehmen
+  * Deutschland
+
+Supplier:
+
+* Vereinsexpress GmbH, Wemding
+  * Alias: *VE*
+  * Kann Laser und Stick Veredelung vornehmen
+  * Prio: 1
+  * Deutschland
+* eleven teamsports stores GmbH, Berlin
+  * Alias: *BER*
+  * Kann keine Veredelung vornehmen
+  * Prio: 1
+  * Deutschland
+* Sport Fleck GbR, Trier
+  * Alias: *SF*
+  * Kann jegliche Veredelung vornehmen
+  * Prio: 1
+  * Deutschland
+* 11teamsports AT GmbH
+  * Alias: *AT*
+  * Kann keine Veredelung vornehmen
+  * Prio: 2
+  * Österreich
+* 11teamsports CH
+  * Alias: *CH*
+  * Kann keine Veredelung vornehmen
+  * Prio: 3
+  * Schweiz
+
+## Auftragstemplates
+
+1. Einpositions-Auftrag Einfach
+
+   Besteht nur aus einer Position, mit Menge 1, die keinen Veredelungs- oder Flockartikel enthält.
+
+2. Mehrpositions-Auftrag Einfach
+
+   Besteht aus zwei Positionen, mit Menge 1, die keine Veredelungs- oder Flockartikel enthalten.
+
+3. Einpositions-Auftrag Mehrfach
+
+   Besteht nur aus einer Position, mit Menge größer 1, die keinen Veredelungs- oder Flockartikel enthält.
+
+4. Mehrpositions-Auftrag Mehrfach
+
+   Besteht aus zwei Positionen, mit Menge größer 1, die keine Veredelungs- oder Flockartikel enthalten.
+
+5. Einpositons-Auftrag Veredelung
+
+   Besteht aus einer Position, mit Menge 1, die einen Veredelungs- oder Flockartikel enthält.
+
+6. Mehrpositions-Auftrag Veredelung
+
+   Besteht aus zwei (unteilbaren) Positionen, mit Menge 1, die einen Veredelungs- oder Flockartikel enthalten.
+
+7. Mehrpositions-Auftrag Mix
+
+   Besteht aus drei Positionen mit jeweils Menge 1. Die erste Position enthält einen normalen Artikel. Die zweite einen Flockartikel und die dritte eine Veredelung.
+
+## 1. Vollständig beim Dealer
+
+| Eigenschaft | Wert
+| --- | ---
+| Auftragstemplate(s) | alle
+| Dealer | kann Auftrag komplett erfüllen
+| Supplier | egal
+
+Resultat:
+
+* Der Auftrag muss als **abgelehnt** markiert werden
+
+## 2. Teilweise beim Dealer, komplett bei den Supplier(n)
+
+| Eigenschaft | Wert
+| --- | ---
+| Auftragstemplate(s) | 2
+| Dealer | kann 1. Position erfüllen
+| VE | kann die 2. Position erfüllen
+| BER | kann die 2. Position erfüllen
+| SF | kann Auftrag komplett erfüllen
+| AT | kann Auftrag komplett erfüllen
+| CH | kann Auftrag komplett erfüllen
+
+Resultat:
+
+* Der Auftrag muss als **zugelassen** markiert werden
+* Der komplette Auftrag muss zu Supplier *SF* übertragen werden
+* AT, CH scheiden wegen niedriger Prio aus
+
+## 3. Teilweise beim Dealer, Teilweise bei den Supplier(n)
+
+| Eigenschaft | Wert
+| --- | ---
+| Auftragstemplate(s) | 2
+| Dealer | kann 1. Position erfüllen
+| VE | kann 2. Position erfüllen
+| BER | kann 2. Position erfüllen
+| SF | kann 1. Position erfüllen
+| AT | kann Auftrag komplett erfüllen
+| CH | kann Auftrag komplett erfüllen
+
+Resultat:
+
+* Der Auftrag muss als **zugelassen** markiert werden
+* Die Position 2 muss zu einem Supplier (VE, BER) übertragen werden
+* Die Position 1 "bleibt" beim Dealer und wird durch diesen erfüllt
+* AT, CH scheiden wegen niedriger Prio aus
+
+## 4. Teilmenge beim Dealer, komplett bei den Supplier(n)
+
+| Eigenschaft | Wert
+| --- | ---
+| Auftragstemplate(s) | 3
+| Dealer | kann Position nur zum Teil erfüllen
+| VE | kann Postion nur zum Teil erfüllen
+| BER | kann Position komplett erfüllen
+| SF | kann Position nicht erfüllen
+| AT | kann Auftrag komplett erfüllen
+| CH | kann Auftrag komplett erfüllen
+
+Resultat:
+
+* Der Auftrag muss als **zugelassen** markiert werde
+* Der komplette Auftrag muss zu Supplier *BER* übertragen werden
+* AT, CH scheiden wegen niedriger Prio aus.
+
+## 5. Teilmenge beim Dealer, Teilmenge bei den Supplier(n)
+
+| Eigenschaft | Wert
+| --- | ---
+| Auftragstemplate(s) | 3
+| Menge der Pos. | 4 (als Bsp.)
+| Dealer | kann Position nur zum Teil erfüllen (2 Stk.)
+| VE | kann Postion nur zum Teil erfüllen (3 Stk.)
+| BER | kann Postion nur zum Teil erfüllen (2 Stk.)
+| SF | kann Position nicht erfüllen
+| AT | kann Auftrag komplett erfüllen
+| CH | kann Auftrag komplett erfüllen
+
+Resultat:
+
+* Der Auftrag muss als **zugelassen** markiert werde
+* Die Position muss mit einer Teilmenge zu einem der Supplier (VE, BER) übertragen werden
+* Die Teilmenge, die zum Supplier übertragen wird, ist gleich:
+
+  ``` sql
+  MAX((GGBestellt - GGGeliefert) - Dealer.Verfügbar, Supplier.Verfügbar)`
+  ```
+
+* Die restliche Teilmenge "bleibt" beim Deauler und wird duch diesen erfüllt
+* Keine weiteren Splits erfolgen da Auftrag nach dem 1. Split komplett erfüllt ist
+* AT, CH scheiden wegen niedriger Prio aus
+
+## 6. Teilmenge beim Dealer, Teilmenge bei den Supplier(n)
+
+| Eigenschaft | Wert
+| --- | ---
+| Auftragstemplate(s) | 3
+| Menge der Pos. | 4 (als Bsp.)
+| Dealer | kann Position nur zum Teil erfüllen (1 Stk.)
+| VE | kann Postion nur zum Teil erfüllen (2 Stk.)
+| BER | kann Postion nur zum Teil erfüllen (2 Stk.)
+| SF | kann Position nicht erfüllen
+| AT | kann Auftrag komplett erfüllen
+| CH | kann Auftrag komplett erfüllen
+
+Resultat:
+
+* Der Auftrag muss als **zugelassen** markiert werde
+* Die Position muss mit einer Teilmenge zu einem der Supplier (VE, BER) übertragen werden
+* Die Teilmenge, die zum Supplier übertragen wird, ist gleich:
+
+  ``` sql
+  MAX((GGBestellt - GGGeliefert) - Dealer.Verfügbar, Supplier.Verfügbar)
+  ```
+
+* Die restliche Teilmenge "bleibt" beim Deauler und wird duch diesen erfüllt
+* Es wird ein weiterer Split generiert, für den Supplier der vorher nicht ausgewählt wurde, da der Auftrag nicht komplett erfüllt worden ist. Die Menge für den Split wird wie oben berechnet (DropLi wurde schon erstellt und somit GGGeliefert erhöht)
+* AT, CH scheiden wegen niedriger Prio aus
