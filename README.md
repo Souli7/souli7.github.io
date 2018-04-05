@@ -241,7 +241,7 @@ Resultat:
 * Die Position muss mit einer Teilmenge zu einem der Supplier (VE, BER) übertragen werden
 * Die Teilmenge, die zum Supplier übertragen wird, ist gleich:
 
-  ``` sql
+  ```
   MAX((GGBestellt - GGGeliefert) - Dealer.Verfügbar, Supplier.Verfügbar)`
   ```
 
@@ -268,7 +268,7 @@ Resultat:
 * Die Position muss mit einer Teilmenge zu einem der Supplier (VE, BER) übertragen werden
 * Die Teilmenge, die zum Supplier übertragen wird, ist gleich:
 
-  ``` sql
+  ```
   MAX((GGBestellt - GGGeliefert) - Dealer.Verfügbar, Supplier.Verfügbar)
   ```
 
