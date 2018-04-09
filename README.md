@@ -48,7 +48,8 @@ var tmp = 0;
 for(var i = 0; i < P; i++) {
     tmp = tmp + MSup[i] * MEK[i];
 }
-y = ((tmp - V) / x) * (1 - A);
+y = (((tmp - V) / x) + (1 - A))/2; // Lieferbare Menge und Auslastung haben das gleiche Gewicht
+yalt = (((tmp - V) / x) * 1,618 + (1 - A))/2,618; // Gewicht der Menge und Auslastung stehen im Goldenen Schnitt zueinander (1,618 : 1)
 ```
 
 Beispiel:
@@ -66,8 +67,10 @@ A1 = 0,8
 A2 = 0,2
 tmp1 = ((1 x 25,00€) + (1 x 5,00€) + (1 x 1,25€) - 4,30€) / 45,00€ = 0,598
 tmp2 = ((3 x 5,00€)) + (4 x 1,25€) - 1,50€) / 45,00€ = 0,411
-y1 = 0,598 * (1 - 0,8) = 0,119
-y2 = 0,444 * (1 - 0,2) = 0,328
+y1 = (0,598 + (1 - 0,8))/2 = 0,399
+y2 = (0,411 + (1 - 0,2))/2 = 0,605
+yalt1 = (0,598 * 1,618 + (1 - 0,8))/2,618 = 0,446
+yalt2 = (0,411 * 1,618 + (1 - 0,2))/2,618 = 0,559
 ```
 
 ## Suche des besten Splits
